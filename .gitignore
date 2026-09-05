@@ -52,6 +52,7 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+attached_assets/
 
 # App build output
 artifacts/*/dist/
