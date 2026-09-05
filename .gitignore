@@ -47,3 +47,16 @@ Thumbs.db
 # Replit
 .cache/
 .local/
+
+# Environment and local secrets
+.env
+.env.*
+!.env.example
+
+# App build output
+artifacts/*/dist/
+artifacts/*/build/
+
+# VPS and deployment artifacts
+deploy/.tmp/
+*.log

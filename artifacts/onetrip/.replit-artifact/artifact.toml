@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "OneTrip"
+description = "An English-first travel booking website for flights, hotels, tours, and transfers, powered by a polished search experience and Travelpayouts partner scripts."
+version = "1.0.0"
+id = "artifacts/onetrip"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 23051
+
+[services.development]
+run = "pnpm --filter @workspace/onetrip run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/onetrip", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/onetrip/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "23051"
+BASE_PATH = "/"
