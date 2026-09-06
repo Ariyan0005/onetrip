@@ -20,9 +20,7 @@ PORT=23051 BASE_PATH=/ pnpm --filter @workspace/onetrip run build
 The included script builds the app, syncs the static output to Nginx, and creates an Nginx site configuration when Nginx is installed:
 
 ```bash
-APP_DIR=/var/www/onetripz.com \
-DOMAIN=your-domain.com \
-./scripts/deploy-vps.sh
+DOMAIN=your-domain.com ./deploy.sh
 ```
 
 After the one-time setup, the same command always pulls the latest `main`
@@ -36,7 +34,7 @@ DOMAIN=your-domain.com \
 APP_DIR=/var/www/onetripz.com \
 DEPLOY_DIR=/var/www/onetrip-public \
 NGINX_SITE_NAME=onetrip \
-./scripts/deploy-vps.sh
+./deploy.sh
 ```
 
 After the first HTTP deploy, point the domain DNS to the VPS and use your VPS provider's TLS tooling (for example Certbot) to enable HTTPS.
