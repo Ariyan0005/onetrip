@@ -1,6 +1,5 @@
 import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { ArrowRight, Check, ChevronDown, Globe2, Hotel, Menu, Plane, Search, ShieldCheck, Sparkles, Ticket, TrainFront, Users, X } from 'lucide-react';
-import logo from '@assets/5133b077-045a-484a-89af-ad49b7795427_1788651701473.png';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -9,6 +8,7 @@ import NotFound from '@/pages/not-found';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
+const logo = `${import.meta.env.BASE_URL}onetrip-logo.png`;
 const partnerScript = 'https://tp-em.com/NTcwNjA3.js?t=570607';
 const languages = ['English', 'Español', 'Français', 'Deutsch', 'Italiano', 'Português', 'Nederlands', 'Türkçe', 'Ελληνικά', '中文', '日本語', '한국어', 'العربية', 'हिन्दी', 'ภาษาไทย', 'Bahasa Indonesia', 'Polski', 'Svenska', 'Dansk', 'Norsk', 'Suomi', 'Čeština', 'Magyar', 'עברית', 'Tiếng Việt', 'Українська'];
 const destinations = [
