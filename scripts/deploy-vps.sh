@@ -20,7 +20,7 @@ DOMAIN="${DOMAIN:-}"
 GIT_BRANCH="${GIT_BRANCH:-main}"
 BUILD_DIR="$APP_DIR/artifacts/onetrip/dist/public"
 DEPLOY_DIR="${DEPLOY_DIR:-$BUILD_DIR}"
-NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetrip}"
+NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetripz.com}"
 
 if [[ -z "$DOMAIN" ]]; then
   echo "Missing DOMAIN. Example: DOMAIN=travel.example.com $0" >&2
@@ -74,9 +74,13 @@ sudo find "$DEPLOY_DIR" -type f -exec chmod 644 {} \;
 if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
   NGINX_AVAILABLE="/etc/nginx/sites-available/$NGINX_SITE_NAME"
   NGINX_ENABLED="/etc/nginx/sites-enabled/$NGINX_SITE_NAME"
-  TMP_CONFIG="$(mktemp)"
+  if [[ -f "$NGINX_AVAILABLE" ]]; then
+    echo "Existing Nginx config detected at $NGINX_AVAILABLE; leaving it unchanged."
+    echo "Make sure its root points to $DEPLOY_DIR."
+  else
+    TMP_CONFIG="$(mktemp)"
 
-  cat > "$TMP_CONFIG" <<EOF
+    cat > "$TMP_CONFIG" <<EOF
 server {
     listen 80;
     listen [::]:80;
@@ -103,12 +107,13 @@ server {
 }
 EOF
 
-  sudo install -m 644 "$TMP_CONFIG" "$NGINX_AVAILABLE"
-  rm -f "$TMP_CONFIG"
-  sudo ln -sfn "$NGINX_AVAILABLE" "$NGINX_ENABLED"
+    sudo install -m 644 "$TMP_CONFIG" "$NGINX_AVAILABLE"
+    rm -f "$TMP_CONFIG"
+    sudo ln -sfn "$NGINX_AVAILABLE" "$NGINX_ENABLED"
+  fi
   sudo nginx -t
   sudo systemctl reload nginx
-  echo "Nginx configured for $DOMAIN."
+  echo "Nginx reloaded for $DOMAIN."
 else
   echo "Nginx was not detected; files were copied but web-server configuration was skipped."
 fi

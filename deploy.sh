@@ -5,5 +5,5 @@ ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 APP_DIR="${APP_DIR:-$ROOT_DIR}" \
 DOMAIN="${DOMAIN:-onetripz.com}" \
-NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetripz}" \
+NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetripz.com}" \
   "$ROOT_DIR/scripts/deploy-vps.sh"
