@@ -1,0 +1,1 @@
+- [GitHub publishing path](github-publishing.md) — when GitHub REST writes are Cloudflare-blocked, a secret-backed local git push is the reliable fallback.
