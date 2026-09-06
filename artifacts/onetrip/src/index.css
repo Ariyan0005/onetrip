@@ -414,6 +414,12 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 
 .ot-search-wrap { position:relative; z-index:3; margin-top:-74px; }
 .ot-search-panel { background:hsl(var(--card)); border:1px solid hsl(var(--card-border)); border-radius:22px; box-shadow:var(--shadow-md); padding:12px; }
+.ot-travelpayouts-panel { padding:22px; }
+.ot-widget-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; padding:3px 5px 18px; }
+.ot-widget-intro .ot-section-kicker { margin:0 0 8px; }
+.ot-widget-intro > p { max-width:300px; margin:0; color:hsl(var(--muted-foreground)); font-size:12px; line-height:1.55; text-align:right; }
+.ot-widget-title { margin:0; color:hsl(var(--secondary)); font-size:clamp(24px, 3vw, 34px); letter-spacing:-.04em; line-height:1; }
+.ot-travelpayouts-panel #tpwl-search { min-height:180px; }
 .ot-search-tabs { display:flex; gap:3px; padding:4px; margin-bottom:11px; border-bottom:1px solid hsl(var(--border)); overflow:auto; }
 .ot-search-tab { border:0; background:transparent; color:hsl(var(--muted-foreground)); padding:11px 15px; border-radius:10px; white-space:nowrap; font-weight:700; cursor:pointer; }
 .ot-search-tab.active { color:hsl(var(--secondary)); background:hsl(var(--muted)); }
@@ -508,6 +514,8 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .ot-trip-visual { min-height:390px; max-width:580px; width:100%; margin:0 auto; }
   .ot-search-grid { grid-template-columns:1fr 1fr; }
   .ot-search-submit { min-height:54px; }
+  .ot-widget-intro { display:block; }
+  .ot-widget-intro > p { margin-top:12px; text-align:left; }
   .ot-destination-grid { grid-template-columns:1fr 1fr; }
   .ot-destination-main { grid-row:auto; grid-column:span 2; min-height:390px; }
   .ot-footer-grid { grid-template-columns:1.5fr 1fr 1fr; }
@@ -518,7 +526,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
   .ot-nav-inner { min-height:68px; }.ot-logo { width:128px; }.ot-mobile-menu { top:68px; }
   .ot-hero { padding-top:47px; }.ot-hero h1 { font-size:48px; }.ot-hero-copy { font-size:15px; }
   .ot-trip-visual { min-height:300px; }.ot-orbit { inset:10% 2% 8% 2%; }.ot-sky-card { inset:8% 0 10% 6%; }.ot-floating-stamp { width:100px; height:100px; font-size:8px; }.ot-floating-stamp strong { font-size:18px; }
-  .ot-search-wrap { margin-top:-64px; }.ot-search-panel { padding:9px; border-radius:17px; }.ot-search-tabs { margin-bottom:8px; }.ot-search-tab { padding:10px 11px; font-size:12px; }
+  .ot-search-wrap { margin-top:-64px; }.ot-search-panel { padding:9px; border-radius:17px; }.ot-travelpayouts-panel { padding:15px; }.ot-search-tabs { margin-bottom:8px; }.ot-search-tab { padding:10px 11px; font-size:12px; }
   .ot-search-grid { grid-template-columns:1fr; }.ot-search-submit { min-height:50px; }
   .ot-section { padding:78px 0; }.ot-section-top { display:block; }.ot-section-intro { margin-top:18px; }.ot-section h2 { font-size:42px; }
   .ot-destination-grid { grid-template-columns:1fr 1fr; gap:9px; }.ot-destination-main { min-height:300px; }.ot-destination.small { min-height:188px; }.ot-destination h3, .ot-destination-main h3 { font-size:24px; }.ot-destination.small h3 { font-size:20px; }.ot-destination-content { inset:auto 13px 13px; }.ot-destination-arrow { width:29px; height:29px; }

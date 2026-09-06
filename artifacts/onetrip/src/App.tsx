@@ -1,5 +1,5 @@
-import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
-import { ArrowRight, Check, ChevronDown, Globe2, Hotel, Menu, Plane, Search, ShieldCheck, Sparkles, Ticket, TrainFront, Users, X } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ArrowRight, Check, ChevronDown, Globe2, Menu, Search, ShieldCheck, Sparkles, Users, X } from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Toaster } from '@/components/ui/toaster';
@@ -8,7 +8,7 @@ import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
 const logo = `${import.meta.env.BASE_URL}onetrip-logo.png`;
-const partnerScript = 'https://tp-em.com/NTcwNjA3.js?t=570607';
+const travelpayoutsWidgetScript = 'https://tpscr.com/wl_web/main.js?wl_id=21725';
 const languages = ['English', 'Español', 'Français', 'Deutsch', 'Italiano', 'Português', 'Nederlands', 'Türkçe', 'Ελληνικά', '中文', '日本語', '한국어', 'العربية', 'हिन्दी', 'ภาษาไทย', 'Bahasa Indonesia', 'Polski', 'Svenska', 'Dansk', 'Norsk', 'Suomi', 'Čeština', 'Magyar', 'עברית', 'Tiếng Việt', 'Українська'];
 const destinations = [
   { name: 'Lisbon', country: 'Portugal', className: 'ot-destination-main' },
@@ -18,35 +18,49 @@ const destinations = [
   { name: 'Mexico City', country: 'Mexico', className: 'small' },
 ];
 
+declare global {
+  interface Window {
+    TPWL_CONFIGURATION?: Record<string, unknown>;
+  }
+}
+
 function Home() {
-  const [tripType, setTripType] = useState('Flights');
   const [menuOpen, setMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [language, setLanguage] = useState('English');
-  const [from, setFrom] = useState('');
-  const [to, setTo] = useState('');
-  const [depart, setDepart] = useState('');
-  const [returnDate, setReturnDate] = useState('');
-  const [guests, setGuests] = useState('1 traveler');
-  const [status, setStatus] = useState('');
   const [toast, setToast] = useState('');
 
   useEffect(() => {
-    const existing = document.querySelector(`script[src="${partnerScript}"]`);
+    window.TPWL_CONFIGURATION = {
+      ...window.TPWL_CONFIGURATION,
+      resultsURL: 'https://book.onetripz.com',
+    };
+
+    const existing = document.querySelector(`script[data-onetrip-travelpayouts-widget="true"]`);
     if (!existing) {
       const script = document.createElement('script');
-      script.src = partnerScript;
+      script.type = 'module';
       script.async = true;
-      script.defer = true;
-      script.dataset.onetripPartner = 'true';
-      document.body.appendChild(script);
+      script.src = travelpayoutsWidgetScript;
+      script.dataset.onetripTravelpayoutsWidget = 'true';
+      script.setAttribute('data-noptimize', '1');
+      script.setAttribute('data-cfasync', 'false');
+      script.setAttribute('data-wpfc-render', 'false');
+      script.setAttribute('data-no-defer', '1');
+      document.head.appendChild(script);
     }
+
     const favicon = document.querySelector<HTMLLinkElement>('link[data-onetrip-favicon]') || document.createElement('link');
     favicon.rel = 'icon';
     favicon.type = 'image/png';
     favicon.href = logo;
     favicon.dataset.onetripFavicon = 'true';
     if (!favicon.parentNode) document.head.appendChild(favicon);
+
+    return () => {
+      document.querySelector('script[data-onetrip-travelpayouts-widget="true"]')?.remove();
+      document.getElementById('tpwl-search')?.replaceChildren();
+    };
   }, []);
 
   useEffect(() => {
@@ -56,17 +70,7 @@ function Home() {
   }, [toast]);
 
   const showToast = (message: string) => setToast(message);
-  const handleSearch = (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!from || !to) {
-      setStatus('Add a departure and destination to compare available options.');
-      return;
-    }
-    setStatus(`Searching ${tripType.toLowerCase()} for ${from} to ${to}. Partner options will open next.`);
-    showToast('Your comparison is being prepared.');
-  };
   const chooseDestination = (destination: string) => {
-    setTo(destination);
     document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
     showToast(`${destination} added as your destination.`);
   };
@@ -120,20 +124,16 @@ function Home() {
       </section>
 
       <section className="ot-container ot-search-wrap" id="search" aria-label="Trip search">
-        <form className="ot-search-panel" onSubmit={handleSearch} data-testid="form-trip-search">
-          <div className="ot-search-tabs" role="tablist" aria-label="Travel type">
-            {['Flights', 'Hotels', 'Tours', 'Transfers'].map((type) => <button type="button" role="tab" aria-selected={tripType === type} className={`ot-search-tab ${tripType === type ? 'active' : ''}`} key={type} onClick={() => { setTripType(type); setStatus(''); }} data-testid={`tab-trip-${type.toLowerCase()}`}>{type === 'Flights' ? <Plane size={15} /> : type === 'Hotels' ? <Hotel size={15} /> : type === 'Tours' ? <Ticket size={15} /> : <TrainFront size={15} />} {type}</button>)}
+        <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
+          <div className="ot-widget-intro">
+            <div>
+              <p className="ot-section-kicker ot-mono">Search with OneTrip</p>
+              <h2 className="ot-widget-title">Find the route that feels right.</h2>
+            </div>
+            <p>Compare live flight options and continue to a trusted booking partner when you are ready.</p>
           </div>
-          <div className="ot-search-grid">
-            <div className="ot-field"><label htmlFor="origin">From</label><input id="origin" value={from} onChange={(event) => setFrom(event.target.value)} placeholder="City or airport" data-testid="input-origin" /></div>
-            <div className="ot-field"><label htmlFor="destination">To</label><input id="destination" value={to} onChange={(event) => setTo(event.target.value)} placeholder="Where to next?" data-testid="input-destination" /></div>
-            <div className="ot-field"><label htmlFor="depart-date">Depart</label><input id="depart-date" type="date" value={depart} onChange={(event) => setDepart(event.target.value)} data-testid="input-depart-date" /></div>
-            <div className="ot-field"><label htmlFor="return-date">Return</label><input id="return-date" type="date" value={returnDate} onChange={(event) => setReturnDate(event.target.value)} data-testid="input-return-date" /></div>
-            <div className="ot-field"><label htmlFor="travelers">Travelers</label><select id="travelers" value={guests} onChange={(event) => setGuests(event.target.value)} data-testid="select-travelers"><option>1 traveler</option><option>2 travelers</option><option>3 travelers</option><option>4 travelers</option><option>5+ travelers</option></select></div>
-          </div>
-          <button className="ot-search-submit" type="submit" data-testid="button-search-submit"><Search size={17} /> Compare options</button>
-          <p className={`ot-search-status ${status ? 'success' : ''}`} role="status" data-testid="status-search">{status || 'Powered by a trusted travel partner network. You choose where to book.'}</p>
-        </form>
+          <div id="tpwl-search" aria-label="Live flight search" />
+        </div>
       </section>
 
       <section className="ot-section ot-container" id="destinations">
