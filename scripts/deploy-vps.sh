@@ -1,13 +1,25 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Deploy the built OneTrip static site to an Nginx-backed VPS.
-# Usage:
-#   DOMAIN=onetrip.example DEPLOY_DIR=/var/www/onetrip ./scripts/deploy-vps.sh
+# Update and deploy the built OneTrip static site to an Nginx-backed VPS.
+# Usage from the cloned repository:
+#   DOMAIN=onetrip.example ./scripts/deploy-vps.sh
+#
+# Usage when installed as /usr/local/bin/onetrip-deploy:
+#   APP_DIR=/var/www/onetripz.com DOMAIN=onetrip.example onetrip-deploy
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+if [[ -n "${APP_DIR:-}" ]]; then
+  APP_DIR="$(cd "$APP_DIR" && pwd)"
+elif [[ -d "$PWD/.git" ]]; then
+  APP_DIR="$(pwd)"
+else
+  APP_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fi
+
 DOMAIN="${DOMAIN:-}"
-DEPLOY_DIR="${DEPLOY_DIR:-/var/www/onetrip}"
+GIT_BRANCH="${GIT_BRANCH:-main}"
+BUILD_DIR="$APP_DIR/artifacts/onetrip/dist/public"
+DEPLOY_DIR="${DEPLOY_DIR:-$BUILD_DIR}"
 NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetrip}"
 
 if [[ -z "$DOMAIN" ]]; then
@@ -20,22 +32,41 @@ command -v pnpm >/dev/null 2>&1 || {
   exit 1
 }
 
-cd "$ROOT_DIR"
+if [[ ! -d "$APP_DIR/.git" ]]; then
+  echo "APP_DIR must point to the cloned OneTrip git repository: $APP_DIR" >&2
+  exit 1
+fi
+
+if [[ "$DEPLOY_DIR" == "$APP_DIR" ]]; then
+  echo "DEPLOY_DIR cannot be the repository root; use the default build output or a separate directory." >&2
+  exit 1
+fi
+
+echo "Updating source from origin/$GIT_BRANCH..."
+git -C "$APP_DIR" pull --ff-only origin "$GIT_BRANCH"
+
+cd "$APP_DIR"
 
 echo "Installing locked dependencies..."
 pnpm install --frozen-lockfile
 
 echo "Building OneTrip..."
-pnpm --filter @workspace/onetrip run build
+PORT="${PORT:-23051}" BASE_PATH="${BASE_PATH:-/}" \
+  pnpm --filter @workspace/onetrip run build
 
-if [[ ! -d "$ROOT_DIR/artifacts/onetrip/dist/public" ]]; then
-  echo "Build output was not found at artifacts/onetrip/dist/public" >&2
+if [[ ! -d "$BUILD_DIR" ]]; then
+  echo "Build output was not found at $BUILD_DIR" >&2
   exit 1
 fi
 
-echo "Publishing files to $DEPLOY_DIR..."
-sudo mkdir -p "$DEPLOY_DIR"
-sudo rsync -a --delete "$ROOT_DIR/artifacts/onetrip/dist/public/" "$DEPLOY_DIR/"
+if [[ "$DEPLOY_DIR" != "$BUILD_DIR" ]]; then
+  echo "Publishing files to $DEPLOY_DIR..."
+  sudo mkdir -p "$DEPLOY_DIR"
+  sudo rsync -a --delete "$BUILD_DIR/" "$DEPLOY_DIR/"
+else
+  echo "Serving the build output directly from $BUILD_DIR."
+fi
+
 sudo chown -R www-data:www-data "$DEPLOY_DIR"
 sudo find "$DEPLOY_DIR" -type d -exec chmod 755 {} \;
 sudo find "$DEPLOY_DIR" -type f -exec chmod 644 {} \;

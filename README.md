@@ -20,14 +20,21 @@ PORT=23051 BASE_PATH=/ pnpm --filter @workspace/onetrip run build
 The included script builds the app, syncs the static output to Nginx, and creates an Nginx site configuration when Nginx is installed:
 
 ```bash
-DOMAIN=your-domain.com ./scripts/deploy-vps.sh
+APP_DIR=/var/www/onetripz.com \
+DOMAIN=your-domain.com \
+./scripts/deploy-vps.sh
 ```
+
+After the one-time setup, the same command always pulls the latest `main`
+branch, installs the locked dependencies, rebuilds the app, and reloads Nginx.
+The site does not need a `.env` file for this static release.
 
 Optional overrides:
 
 ```bash
 DOMAIN=your-domain.com \
-DEPLOY_DIR=/var/www/onetrip \
+APP_DIR=/var/www/onetripz.com \
+DEPLOY_DIR=/var/www/onetrip-public \
 NGINX_SITE_NAME=onetrip \
 ./scripts/deploy-vps.sh
 ```
