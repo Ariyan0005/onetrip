@@ -10,12 +10,65 @@ const queryClient = new QueryClient();
 const logo = `${import.meta.env.BASE_URL}onetrip-logo.png`;
 const travelpayoutsWidgetScript = 'https://tpscr.com/wl_web/main.js?wl_id=21725';
 const languages = ['English', 'Español', 'Français', 'Deutsch', 'Italiano', 'Português', 'Nederlands', 'Türkçe', 'Ελληνικά', '中文', '日本語', '한국어', 'العربية', 'हिन्दी', 'ภาษาไทย', 'Bahasa Indonesia', 'Polski', 'Svenska', 'Dansk', 'Norsk', 'Suomi', 'Čeština', 'Magyar', 'עברית', 'Tiếng Việt', 'Українська'];
-const destinations = [
-  { name: 'Lisbon', country: 'Portugal', className: 'ot-destination-main' },
-  { name: 'Kyoto', country: 'Japan', className: 'small' },
-  { name: 'Marrakech', country: 'Morocco', className: 'small' },
-  { name: 'Reykjavík', country: 'Iceland', className: 'small' },
-  { name: 'Mexico City', country: 'Mexico', className: 'small' },
+
+interface IconicSpot {
+  city: string;
+  country: string;
+  spotName: string;
+  tag: string;
+  image: string;
+  highlight: string;
+}
+
+const iconicSpots: IconicSpot[] = [
+  {
+    city: 'Lauterbrunnen',
+    country: 'Switzerland',
+    spotName: 'Staubbach Falls & Alpine Valley',
+    tag: 'Swiss Alps Sanctuary',
+    image: 'https://images.unsplash.com/photo-1530122037265-a5f1f91d3b99?auto=format&fit=crop&w=1200&q=80',
+    highlight: '72 roaring glacial waterfalls cascading down sheer limestone cliffs in the heart of the Bernese Oberland.',
+  },
+  {
+    city: 'Kyoto',
+    country: 'Japan',
+    spotName: 'Arashiyama Bamboo Forest & Sagano',
+    tag: 'Ancient Cultural Haven',
+    image: 'https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?auto=format&fit=crop&w=1200&q=80',
+    highlight: 'Soaring jade-green bamboo canopies, centuries-old Zen temples, and tranquil stone path walks.',
+  },
+  {
+    city: 'Santorini',
+    country: 'Greece',
+    spotName: 'Oia Cliffs & Aegean Caldera',
+    tag: 'Aegean Island Gem',
+    image: 'https://images.unsplash.com/photo-1570077188670-e3a8d69ac5ff?auto=format&fit=crop&w=1200&q=80',
+    highlight: 'Whitewashed cliffside villas, cobalt-blue domes, and world-famous golden sunsets melting into the sea.',
+  },
+  {
+    city: 'Ubud & Bali',
+    country: 'Indonesia',
+    spotName: 'Tegallalang Emerald Terraces',
+    tag: 'Tropical Nature',
+    image: 'https://images.unsplash.com/photo-1537996194471-e657df975ab4?auto=format&fit=crop&w=1200&q=80',
+    highlight: 'Cascading verdant rice paddies carved by ancient subak irrigation, shrouded in morning rainforest mist.',
+  },
+  {
+    city: 'Banff',
+    country: 'Canada',
+    spotName: 'Moraine Lake & Valley of the Ten Peaks',
+    tag: 'Canadian Rockies',
+    image: 'https://images.unsplash.com/photo-1503614472-8c93d56e92ce?auto=format&fit=crop&w=1200&q=80',
+    highlight: 'Crystalline turquoise glacial water framed by rugged snow-capped peaks and towering pine forests.',
+  },
+  {
+    city: 'Cappadocia',
+    country: 'Turkey',
+    spotName: 'Göreme Valley Sunrise Balloons',
+    tag: 'Surreal Landscapes',
+    image: 'https://images.unsplash.com/photo-1641128324972-af3212f0f6bd?auto=format&fit=crop&w=1200&q=80',
+    highlight: 'Hundreds of vibrant hot-air balloons rising over whimsical fairy chimneys and ancient cave dwellings.',
+  },
 ];
 
 interface FAQItem {
@@ -182,10 +235,49 @@ function Home() {
         </div>
       </section>
 
-      <section className="ot-section ot-container" id="destinations">
-        <div className="ot-section-top"><div><p className="ot-section-kicker ot-mono">A little further</p><h2 className="ot-display">Places with a pull.</h2></div><p className="ot-section-intro">Start with a feeling, not a spreadsheet. These are the places our editors keep returning to — for very good reasons.</p></div>
-        <div className="ot-destination-grid">
-          {destinations.map((destination, index) => <button className={`ot-destination ${destination.className}`} key={destination.name} onClick={() => chooseDestination(destination.name)} data-testid={`card-destination-${index}`}><div className="ot-destination-content"><div><h3>{destination.name}</h3><p>{destination.country}</p></div><span className="ot-destination-arrow"><ArrowRight size={15} /></span></div></button>)}
+      <section className="ot-section ot-container" id="destinations" aria-labelledby="destinations-heading">
+        <div className="ot-section-top">
+          <div>
+            <p className="ot-section-kicker ot-mono">Iconic World Landmarks & Spots</p>
+            <h2 id="destinations-heading" className="ot-display">Places that stay with you forever.</h2>
+          </div>
+          <p className="ot-section-intro">Experience the world's most breathtaking natural wonders, historic sanctuaries, and dramatic landscapes.</p>
+        </div>
+        <div className="ot-photo-grid">
+          {iconicSpots.map((spot, index) => (
+            <article
+              className="ot-photo-card"
+              key={spot.spotName}
+              data-testid={`spot-card-${index}`}
+              onClick={() => {
+                document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                showToast(`Search flights & stays to ${spot.city}, ${spot.country}`);
+              }}
+            >
+              <div className="ot-photo-viewport">
+                <img
+                  src={spot.image}
+                  alt={`${spot.spotName} in ${spot.city}, ${spot.country}`}
+                  loading="lazy"
+                  className="ot-photo-img"
+                />
+                <div className="ot-photo-overlay" />
+                <span className="ot-photo-tag">{spot.tag}</span>
+              </div>
+              <div className="ot-photo-details">
+                <div className="ot-photo-meta">
+                  <span className="ot-photo-country">{spot.country}</span>
+                  <span className="ot-photo-city">&bull; {spot.city}</span>
+                </div>
+                <h3 className="ot-photo-title">{spot.spotName}</h3>
+                <p className="ot-photo-highlight">{spot.highlight}</p>
+                <div className="ot-photo-action">
+                  <span>Explore flights & hotels</span>
+                  <ArrowRight size={14} />
+                </div>
+              </div>
+            </article>
+          ))}
         </div>
       </section>
 
