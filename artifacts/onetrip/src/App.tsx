@@ -202,26 +202,23 @@ function Home() {
       <section className="ot-hero" id="top">
         <div className="ot-container">
           <div className="ot-hero-header">
-            <div className="ot-hero-badges">
-              <span className="ot-eyebrow ot-mono">Real-Time Travel Search</span>
-              <div className="ot-hero-live-badge"><span className="ot-live-dot" /> 500+ Airlines</div>
-            </div>
-            <h1 className="ot-hero-title">Compare flight tickets, hotels, and tours worldwide</h1>
-            <p className="ot-hero-copy">Search and compare real-time airfares from over 500 airlines with zero booking fees.</p>
+            <h1 className="ot-hero-title">Compare flight tickets,<br className="ot-break-mobile" /> hotels & tours worldwide</h1>
           </div>
 
           <div className="ot-search-wrap" id="search" aria-label="Trip search">
             <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
-              <div className="ot-widget-intro">
-                <div>
-                  <p className="ot-section-kicker ot-mono">Instant Search</p>
-                  <h2 className="ot-widget-title">Where do you want to fly?</h2>
-                </div>
-                <div className="ot-hero-note"><ShieldCheck size={14} /><span>Official rates &bull; No fees</span></div>
-              </div>
               <div className="ot-tpwl-widget-host" data-testid="container-tpwl-host">
                 <div id="tpwl-search" aria-label="Flight search form" />
                 <div id="tpwl-tickets" aria-label="Flight search results" />
+              </div>
+
+              {/* Title & Trust Info Under the Search Widget */}
+              <div className="ot-widget-footer">
+                <div className="ot-widget-footer-main">
+                  <p className="ot-section-kicker ot-mono">Where do you want to fly?</p>
+                  <p className="ot-widget-sub">Search real-time airfares and hotel deals across 500+ verified airlines with zero booking fees.</p>
+                </div>
+                <div className="ot-hero-note"><ShieldCheck size={14} /><span>Official rates &bull; No hidden markups</span></div>
               </div>
             </div>
           </div>
