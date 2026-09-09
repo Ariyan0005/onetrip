@@ -200,37 +200,30 @@ function Home() {
       </header>
 
       <section className="ot-hero" id="top">
-        <div className="ot-container ot-hero-grid">
-          <div>
-            <p className="ot-eyebrow ot-mono">The clear way to go further</p>
+        <div className="ot-container">
+          <div className="ot-hero-header">
+            <div className="ot-hero-badges">
+              <span className="ot-eyebrow ot-mono">Global Flight & Travel Search</span>
+              <div className="ot-hero-live-badge"><span className="ot-live-dot" /> Live Meta Search</div>
+            </div>
             <h1 className="ot-display">Compare flight tickets, hotels, and tours worldwide.</h1>
-            <p className="ot-hero-copy">Find and compare real-time airfares from over 500 airlines and certified travel partners. OneTripz delivers clean comparisons, no booking fees, and straightforward travel planning.</p>
-            <div className="ot-hero-actions">
-              <a className="ot-primary-btn" href="#search" data-testid="link-hero-search">Search flights & stays <ArrowRight size={17} /></a>
-              <a className="ot-ghost-btn" href="#destinations" data-testid="link-hero-explore">Explore destinations</a>
-            </div>
-            <div className="ot-hero-note"><ShieldCheck size={16} /><span>Independent comparisons. Real-time rates. No hidden fees.</span></div>
+            <p className="ot-hero-copy">Find and compare real-time airfares from over 500 airlines and certified partners. Zero booking fees, direct airline checkout, and clear rates.</p>
           </div>
-          <div className="ot-trip-visual" aria-label="Illustration of a route connecting Lisbon and Tokyo">
-            <div className="ot-orbit" />
-            <div className="ot-sky-card"><div className="ot-route" /><span className="ot-route-label ot-mono">START HERE</span><span className="ot-city"><strong>Lisbon</strong>38°43′N · 9°08′W</span></div>
-            <div className="ot-floating-stamp"><div><strong>01</strong>one good<br />place to begin</div></div>
-          </div>
-        </div>
-      </section>
 
-      <section className="ot-container ot-search-wrap" id="search" aria-label="Trip search">
-        <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
-          <div className="ot-widget-intro">
-            <div>
-              <p className="ot-section-kicker ot-mono">Search with OneTripz</p>
-              <h2 className="ot-widget-title">Find the route that feels right.</h2>
+          <div className="ot-search-wrap" id="search" aria-label="Trip search">
+            <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
+              <div className="ot-widget-intro">
+                <div>
+                  <p className="ot-section-kicker ot-mono">Instant Fare Comparison</p>
+                  <h2 className="ot-widget-title">Where do you want to fly?</h2>
+                </div>
+                <div className="ot-hero-note"><ShieldCheck size={16} /><span>Real-time rates &bull; No hidden fees &bull; Official partners</span></div>
+              </div>
+              <div className="ot-tpwl-widget-host" data-testid="container-tpwl-host">
+                <div id="tpwl-search" aria-label="Flight search form" />
+                <div id="tpwl-tickets" aria-label="Flight search results" />
+              </div>
             </div>
-            <p>Compare live flight options and continue to a trusted booking partner when you are ready.</p>
-          </div>
-          <div className="ot-tpwl-widget-host" data-testid="container-tpwl-host">
-            <div id="tpwl-search" aria-label="Flight search form" />
-            <div id="tpwl-tickets" aria-label="Flight search results" />
           </div>
         </div>
       </section>

@@ -380,47 +380,28 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .ot-mobile-menu { position:absolute; top:78px; left:0; right:0; background:hsl(var(--background)); border-bottom:1px solid hsl(var(--border)); padding:14px 20px 22px; box-shadow:var(--shadow); }
 .ot-mobile-menu a { display:block; padding:14px 0; color:hsl(var(--secondary)); font-weight:700; border-bottom:1px solid hsl(var(--border)); }
 
-.ot-hero { position:relative; padding:82px 0 132px; background: radial-gradient(circle at 80% 19%, hsl(188 92% 39% / .09), transparent 27%), hsl(var(--background)); }
-.ot-hero::before { content:''; position:absolute; top:0; left:50%; width:1px; height:100%; background:hsl(213 22% 86% / .55); pointer-events:none; }
-.ot-hero-grid { position:relative; display:grid; grid-template-columns: 1.02fr .98fr; gap:58px; align-items:center; }
-.ot-eyebrow { color:hsl(var(--primary)); font-size:11px; font-weight:700; margin-bottom:22px; }
-.ot-hero h1 { color:hsl(var(--secondary)); font-size:clamp(52px, 6.7vw, 88px); line-height:.95; max-width:650px; margin:0 0 24px; }
-.ot-hero h1 em { color:hsl(var(--primary)); font-style:normal; }
-.ot-hero-copy { color:hsl(var(--muted-foreground)); max-width:450px; font-size:17px; line-height:1.65; margin:0; }
-.ot-hero-actions { margin-top:34px; display:flex; align-items:center; gap:22px; flex-wrap:wrap; }
-.ot-primary-btn, .ot-ghost-btn { border-radius:999px; min-height:50px; display:inline-flex; align-items:center; justify-content:center; gap:10px; padding:0 22px; font-weight:700; cursor:pointer; border:1px solid transparent; transition:transform .22s ease, box-shadow .22s ease, background-color .22s ease; }
-.ot-primary-btn { background:hsl(var(--primary)); color:hsl(var(--primary-foreground)); box-shadow:0 9px 20px hsl(188 92% 39% / .2); }
-.ot-primary-btn:hover { transform:translateY(-2px); box-shadow:0 13px 26px hsl(188 92% 39% / .27); }
-.ot-ghost-btn { color:hsl(var(--secondary)); background:transparent; border-color:hsl(var(--border)); }
-.ot-ghost-btn:hover { background:hsl(var(--muted)); transform:translateY(-2px); }
-.ot-hero-note { display:flex; align-items:center; gap:10px; font-size:12px; color:hsl(var(--muted-foreground)); margin-top:22px; }
-.ot-hero-note svg { color:hsl(156 42% 48%); }
-.ot-trip-visual { position:relative; min-height:475px; }
-.ot-orbit { position:absolute; inset:13% 10% 9% 4%; border:1px solid hsl(var(--primary) / .28); border-radius:50%; transform:rotate(-19deg); }
-.ot-orbit::before, .ot-orbit::after { content:''; position:absolute; border-radius:50%; background:hsl(var(--primary)); box-shadow:0 0 0 7px hsl(var(--primary) / .1); }
-.ot-orbit::before { width:10px; height:10px; top:13%; left:17%; }
-.ot-orbit::after { width:7px; height:7px; right:12%; bottom:21%; background:hsl(var(--accent)); box-shadow:0 0 0 7px hsl(var(--accent) / .13); }
-.ot-sky-card { position:absolute; inset:11% 5% 12% 12%; overflow:hidden; border-radius:32px; background: linear-gradient(151deg, hsl(213 58% 16%), hsl(213 52% 25%) 60%, hsl(188 92% 39%)); box-shadow:var(--shadow-xl); transform:rotate(3deg); }
-.ot-sky-card::before { content:''; position:absolute; inset:0; opacity:.4; background:radial-gradient(circle at 73% 22%, hsl(42 80% 82% / .48) 0 2px, transparent 3px),radial-gradient(circle at 19% 70%, hsl(42 80% 82% / .3) 0 1px, transparent 2px),radial-gradient(circle at 46% 48%, hsl(188 92% 66% / .4) 0 1px, transparent 2px); background-size:88px 88px, 57px 57px, 71px 71px; }
-.ot-sky-card::after { content:''; position:absolute; width:290px; height:290px; right:-95px; top:-73px; border-radius:50%; background:hsl(42 80% 82% / .12); }
-.ot-route { position:absolute; left:14%; top:27%; width:74%; height:44%; border-top:1px dashed hsl(42 80% 82% / .7); border-radius:50%; transform:rotate(18deg); }
-.ot-route::before, .ot-route::after { content:''; position:absolute; width:12px; height:12px; border-radius:50%; background:hsl(var(--accent)); box-shadow:0 0 0 6px hsl(var(--accent) / .15); }
-.ot-route::before { left:0; top:-7px; }.ot-route::after { right:0; bottom:-6px; }
-.ot-route-label { position:absolute; left:18%; top:21%; color:hsl(42 80% 82%); font-size:11px; }
-.ot-city { position:absolute; right:12%; bottom:20%; color:hsl(42 80% 82%); font-size:11px; text-align:right; }
-.ot-city strong { display:block; font-family:var(--app-font-serif); font-size:25px; letter-spacing:-.05em; color:hsl(42 80% 96%); }
-.ot-floating-stamp { position:absolute; z-index:2; bottom:6%; left:3%; width:140px; height:140px; border-radius:50%; border:1px solid hsl(var(--accent) / .65); background:hsl(var(--background)); display:flex; align-items:center; justify-content:center; text-align:center; color:hsl(var(--secondary)); font-size:10px; line-height:1.5; box-shadow:var(--shadow-lg); transform:rotate(-12deg); }
-.ot-floating-stamp strong { display:block; font-family:var(--app-font-serif); font-size:24px; color:hsl(var(--primary)); }
+/* High-Converting Above-The-Fold Hero */
+.ot-hero { position:relative; padding:54px 0 84px; background: radial-gradient(circle at 50% 10%, hsl(188 92% 39% / .08), transparent 45%), hsl(var(--background)); }
+.ot-hero-header { text-align:center; max-width:820px; margin:0 auto 34px; }
+.ot-hero-badges { display:inline-flex; align-items:center; gap:12px; margin-bottom:18px; }
+.ot-hero-live-badge { display:inline-flex; align-items:center; gap:6px; font-family:var(--app-font-mono); font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; color:hsl(156 42% 38%); background:hsl(156 42% 48% / .12); padding:4px 10px; border-radius:999px; }
+.ot-live-dot { width:7px; height:7px; border-radius:50%; background:hsl(156 42% 48%); animation:ot-pulse 2s infinite; }
+@keyframes ot-pulse { 0%, 100% { opacity:1; transform:scale(1); } 50% { opacity:.4; transform:scale(1.2); } }
+.ot-eyebrow { color:hsl(var(--primary)); font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin:0; }
+.ot-hero h1 { color:hsl(var(--secondary)); font-size:clamp(36px, 4.8vw, 62px); line-height:1.08; margin:0 0 16px; letter-spacing:-.03em; }
+.ot-hero-copy { color:hsl(var(--muted-foreground)); max-width:620px; margin:0 auto; font-size:16px; line-height:1.6; }
 
-.ot-search-wrap { position:relative; z-index:3; margin-top:-74px; }
-.ot-search-panel { background:hsl(var(--card)); border:1px solid hsl(var(--card-border)); border-radius:22px; box-shadow:var(--shadow-md); padding:12px; }
-.ot-travelpayouts-panel { padding:22px; }
-.ot-widget-intro { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; padding:3px 5px 18px; }
-.ot-widget-intro .ot-section-kicker { margin:0 0 8px; }
-.ot-widget-intro > p { max-width:300px; margin:0; color:hsl(var(--muted-foreground)); font-size:12px; line-height:1.55; text-align:right; }
-.ot-widget-title { margin:0; color:hsl(var(--secondary)); font-size:clamp(24px, 3vw, 34px); letter-spacing:-.04em; line-height:1; }
+.ot-search-wrap { position:relative; z-index:5; width:100%; max-width:1080px; margin:0 auto; }
+.ot-search-panel { background:hsl(var(--card)); border:1px solid hsl(var(--card-border)); border-radius:24px; box-shadow:0 20px 45px -15px rgba(15, 23, 42, 0.12), 0 0 0 1px hsl(var(--card-border)); padding:24px; }
+.ot-travelpayouts-panel { padding:24px; }
+.ot-widget-intro { display:flex; align-items:center; justify-content:space-between; gap:20px; padding-bottom:18px; border-bottom:1px solid hsl(var(--border) / .6); margin-bottom:16px; flex-wrap:wrap; }
+.ot-widget-intro .ot-section-kicker { margin:0 0 4px; font-size:10px; }
+.ot-widget-title { margin:0; color:hsl(var(--secondary)); font-size:clamp(20px, 2.4vw, 26px); letter-spacing:-.03em; line-height:1.2; font-family:var(--app-font-serif); }
+.ot-hero-note { display:flex; align-items:center; gap:8px; font-size:12px; color:hsl(var(--muted-foreground)); font-family:var(--app-font-sans); }
+.ot-hero-note svg { color:hsl(156 42% 48%); flex-shrink:0; }
+
 .ot-travelpayouts-panel #tpwl-search,
-.ot-travelpayouts-panel .ot-tpwl-widget-host { min-height:160px; width:100%; display:block; }
+.ot-travelpayouts-panel .ot-tpwl-widget-host { min-height:150px; width:100%; display:block; }
 .ot-travelpayouts-panel #tpwl-search { width:100%; }
 .ot-travelpayouts-panel #tpwl-tickets { width:100%; }
 
