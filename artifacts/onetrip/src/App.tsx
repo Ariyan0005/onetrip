@@ -120,13 +120,13 @@ function Home() {
         <div className="ot-container ot-hero-grid">
           <div>
             <p className="ot-eyebrow ot-mono">The clear way to go further</p>
-            <h1 className="ot-display">Your next trip, <em>sorted.</em></h1>
-            <p className="ot-hero-copy">Compare flights, stays, tours, and transfers in one calm place. OneTripz turns the big, messy question of “where next?” into a plan you can feel good about.</p>
+            <h1 className="ot-display">Compare flight tickets, hotels, and tours worldwide.</h1>
+            <p className="ot-hero-copy">Find and compare real-time airfares from over 500 airlines and certified travel partners. OneTripz delivers clean comparisons, no booking fees, and straightforward travel planning.</p>
             <div className="ot-hero-actions">
-              <a className="ot-primary-btn" href="#search" data-testid="link-hero-search">Find my way <ArrowRight size={17} /></a>
+              <a className="ot-primary-btn" href="#search" data-testid="link-hero-search">Search flights & stays <ArrowRight size={17} /></a>
               <a className="ot-ghost-btn" href="#destinations" data-testid="link-hero-explore">Explore destinations</a>
             </div>
-            <div className="ot-hero-note"><ShieldCheck size={16} /><span>Independent comparisons. Clear prices. No planning fog.</span></div>
+            <div className="ot-hero-note"><ShieldCheck size={16} /><span>Independent comparisons. Real-time rates. No hidden fees.</span></div>
           </div>
           <div className="ot-trip-visual" aria-label="Illustration of a route connecting Lisbon and Tokyo">
             <div className="ot-orbit" />
