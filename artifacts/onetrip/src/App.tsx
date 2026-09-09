@@ -18,22 +18,52 @@ const destinations = [
   { name: 'Mexico City', country: 'Mexico', className: 'small' },
 ];
 
-const faqs = [
+interface FAQItem {
+  category: 'Flights' | 'Hotels' | 'Transfers' | 'Tours';
+  q: string;
+  a: string;
+}
+
+const faqs: FAQItem[] = [
   {
-    q: 'How does OneTripz find cheap flight tickets?',
-    a: 'OneTripz scans and compares live airfares from over 500 airlines, low-cost carriers, and certified ticket providers in real time, delivering the best available flight rates without having to check multiple websites.',
+    category: 'Flights',
+    q: 'When is the best time to book cheap flight tickets?',
+    a: 'Generally, booking 3 to 8 weeks before domestic flights and 2 to 4 months before international departures provides the most competitive airfares. Tuesdays and Wednesdays frequently offer lower rates compared to peak weekend travel days.',
   },
   {
-    q: 'Does OneTripz charge any booking fees?',
-    a: 'No. OneTripz is 100% free for travelers. There are zero hidden fees, extra surcharges, or markups. You always proceed and complete your booking directly on the airline or verified agency partner site.',
+    category: 'Flights',
+    q: 'Does OneTripz charge any booking or transaction fees?',
+    a: 'Never. OneTripz is 100% free for travelers. There are zero hidden fees, markups, or service charges. You compare real-time prices here and complete your reservation directly on verified airline or certified agency partner platforms.',
   },
   {
-    q: 'Can I search for both international and domestic flights?',
-    a: 'Yes, our global search engine supports international routes worldwide as well as domestic flights across North America, Europe, Asia, the Middle East, and Australasia.',
+    category: 'Hotels',
+    q: 'How can I ensure there are no surprise fees on hotel bookings?',
+    a: 'Always check whether local city taxes or resort fees are included in the checkout summary. We connect you with top global platforms that clearly state cancellation policies and breakdown taxes upfront before you pay.',
   },
   {
-    q: 'What is the best way to get discount airfares?',
-    a: 'Book 3–8 weeks prior to departure, stay flexible with midweek travel dates (Tuesdays and Wednesdays often have lower fares), and compare different departure times using our real-time filter panel.',
+    category: 'Hotels',
+    q: 'Can I book hotels with free cancellation?',
+    a: 'Yes. Most partner properties provide flexible booking options with free cancellation up to 24 to 48 hours before check-in, giving you peace of mind if your itinerary changes.',
+  },
+  {
+    category: 'Transfers',
+    q: 'Why should I pre-book an airport transfer or rental car?',
+    a: 'Pre-booking airport transfers or car rentals guarantees a fixed upfront rate, eliminating long airport taxi queues, language barriers, and peak surge pricing when you arrive in an unfamiliar city.',
+  },
+  {
+    category: 'Transfers',
+    q: 'How do airport pickup meet-and-greet services work?',
+    a: 'Professional transfer drivers track your flight arrival in real time. They meet you inside the arrivals hall holding a sign with your name, assist with your luggage, and provide direct door-to-door transport.',
+  },
+  {
+    category: 'Tours',
+    q: 'Why is it better to book tour guides and attractions in advance?',
+    a: 'Popular landmarks (such as museums, observation decks, and historical ruins) often enforce timed entry slots or sell out days in advance. Pre-booking secures your entry and usually includes skip-the-line privileges.',
+  },
+  {
+    category: 'Tours',
+    q: 'Do I need printed vouchers for tours and experience tickets?',
+    a: 'In almost all destinations, mobile digital e-vouchers on your smartphone are fully accepted at the turnstile or by your tour guide—no paper printing required.',
   },
 ];
 
@@ -188,6 +218,9 @@ function Home() {
         <div className="ot-faq-grid">
           {faqs.map((faq, idx) => (
             <article className="ot-faq-card" key={idx} data-testid={`card-faq-${idx}`}>
+              <div className="ot-faq-header">
+                <span className="ot-faq-category">{faq.category}</span>
+              </div>
               <h3>{faq.q}</h3>
               <p>{faq.a}</p>
             </article>
