@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Update and deploy the built OneTrip static site to an Nginx-backed VPS.
+# Update and deploy the built OneTripz static site to an Nginx-backed VPS.
 # Usage from the cloned repository:
 #   DOMAIN=onetrip.example ./scripts/deploy-vps.sh
 #
@@ -33,7 +33,7 @@ command -v pnpm >/dev/null 2>&1 || {
 }
 
 if [[ ! -d "$APP_DIR/.git" ]]; then
-  echo "APP_DIR must point to the cloned OneTrip git repository: $APP_DIR" >&2
+  echo "APP_DIR must point to the cloned OneTripz git repository: $APP_DIR" >&2
   exit 1
 fi
 
@@ -50,7 +50,7 @@ cd "$APP_DIR"
 echo "Installing locked dependencies..."
 pnpm install --frozen-lockfile
 
-echo "Building OneTrip..."
+echo "Building OneTripz..."
 PORT="${PORT:-23051}" BASE_PATH="${BASE_PATH:-/}" \
   pnpm --filter @workspace/onetrip run build
 
@@ -118,4 +118,4 @@ else
   echo "Nginx was not detected; files were copied but web-server configuration was skipped."
 fi
 
-echo "OneTrip deployed successfully to $DEPLOY_DIR."
+echo "OneTripz deployed successfully to $DEPLOY_DIR."

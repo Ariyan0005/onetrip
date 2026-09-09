@@ -1,6 +1,6 @@
-# OneTrip
+# OneTripz
 
-OneTrip is an English-first travel booking website for comparing flights, stays, tours, and transfers through a Travelpayouts partner flow.
+OneTripz is an English-first travel booking website for comparing flights, stays, tours, and transfers through a Travelpayouts partner flow.
 
 ## Local development
 
