@@ -18,17 +18,6 @@ const destinations = [
   { name: 'Mexico City', country: 'Mexico', className: 'small' },
 ];
 
-const popularRoutes = [
-  { from: 'London (LHR)', to: 'Dubai (DXB)', tag: 'Top International', price: 'from $319' },
-  { from: 'New York (JFK)', to: 'Paris (CDG)', tag: 'Transatlantic', price: 'from $389' },
-  { from: 'Dhaka (DAC)', to: 'Bangkok (BKK)', tag: 'Regional Hub', price: 'from $175' },
-  { from: 'Dubai (DXB)', to: 'Singapore (SIN)', tag: 'Global Corridor', price: 'from $285' },
-  { from: 'Singapore (SIN)', to: 'Tokyo (HND)', tag: 'East Asia', price: 'from $335' },
-  { from: 'Sydney (SYD)', to: 'Bali (DPS)', tag: 'Island Holiday', price: 'from $215' },
-  { from: 'London (LHR)', to: 'Dhaka (DAC)', tag: 'Direct & 1-Stop', price: 'from $540' },
-  { from: 'Toronto (YYZ)', to: 'London (LHR)', tag: 'Atlantic Way', price: 'from $360' },
-];
-
 const faqs = [
   {
     q: 'How does OneTripz find cheap flight tickets?',
@@ -105,7 +94,6 @@ function Home() {
           <nav className="ot-nav-links" aria-label="Primary navigation">
             <a href="#search" data-testid="link-flights">Flights</a>
             <a href="#destinations" data-testid="link-destinations">Destinations</a>
-            <a href="#routes" data-testid="link-routes">Routes</a>
             <a href="#faq" data-testid="link-faq">FAQ</a>
             <a href="#why-onetrip" data-testid="link-why-onetrip">Why OneTripz</a>
           </nav>
@@ -123,7 +111,6 @@ function Home() {
         {menuOpen && <div className="ot-mobile-menu">
           <a href="#search" onClick={() => setMenuOpen(false)} data-testid="mobile-link-search">Search a trip</a>
           <a href="#destinations" onClick={() => setMenuOpen(false)} data-testid="mobile-link-destinations">Destinations</a>
-          <a href="#routes" onClick={() => setMenuOpen(false)} data-testid="mobile-link-routes">Popular Routes</a>
           <a href="#faq" onClick={() => setMenuOpen(false)} data-testid="mobile-link-faq">FAQ</a>
           <a href="#why-onetrip" onClick={() => setMenuOpen(false)} data-testid="mobile-link-why">Why OneTripz</a>
         </div>}
@@ -172,45 +159,6 @@ function Home() {
         </div>
       </section>
 
-      <section className="ot-section ot-container" id="routes" aria-labelledby="routes-heading">
-        <div className="ot-section-top">
-          <div>
-            <p className="ot-section-kicker ot-mono">Global & Regional Flight Deals</p>
-            <h2 id="routes-heading" className="ot-display">Popular flight routes.</h2>
-          </div>
-          <p className="ot-section-intro">
-            Compare live discount airfares on top international flight hubs and regional corridors. One click to scan schedules and lowest airline prices.
-          </p>
-        </div>
-        <div className="ot-routes-grid">
-          {popularRoutes.map((route, idx) => (
-            <a
-              key={idx}
-              href="#search"
-              className="ot-route-card"
-              onClick={() => {
-                document.getElementById('search')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                showToast(`Searching flight deals: ${route.from} to ${route.to}`);
-              }}
-              data-testid={`link-route-${idx}`}
-            >
-              <div>
-                <div className="ot-route-header">
-                  <span className="ot-route-tag">{route.tag}</span>
-                  <span className="ot-route-price">{route.price}</span>
-                </div>
-                <div className="ot-route-cities">
-                  <span>{route.from}</span>
-                  <ArrowRight size={14} />
-                  <span>{route.to}</span>
-                </div>
-              </div>
-              <p className="ot-route-sub">Compare live airline fares & schedules</p>
-            </a>
-          ))}
-        </div>
-      </section>
-
       <section className="ot-section ot-editorial" id="why-onetrip">
         <div className="ot-container ot-editorial-grid">
           <div><p className="ot-section-kicker ot-mono">Less noise. More north star.</p><h2 className="ot-display">Plans should leave room for anticipation.</h2><p className="ot-editorial-copy">OneTripz brings the useful bits together without making you feel like a transaction. Find the route, the room, and the small details that make a place yours.</p><ul className="ot-editorial-list"><li><span>01</span><div><strong>See the whole picture</strong><br />Compare the things that matter before you commit.</div></li><li><span>02</span><div><strong>Trust your next step</strong><br />Clear information, familiar partners, no surprise turns.</div></li><li><span>03</span><div><strong>Keep the good part</strong><br />Less tab-switching. More daydreaming.</div></li></ul></div>
@@ -252,7 +200,7 @@ function Home() {
       </section>
 
       <footer className="ot-footer">
-        <div className="ot-container"><div className="ot-footer-grid"><div><img src={logo} alt="OneTripz" className="ot-footer-logo" /><p>A clearer way to compare and book the parts of a trip that make it yours.</p></div><div><h4>Explore</h4><a href="#search" data-testid="footer-link-search">Search flights</a><a href="#destinations" data-testid="footer-link-destinations">Destinations</a><a href="#routes" data-testid="footer-link-routes">Popular routes</a><a href="#faq" data-testid="footer-link-faq">FAQ</a><a href="#why-onetrip" data-testid="footer-link-about">Why OneTripz</a></div><div><h4>Travel well</h4><a href="#search" data-testid="footer-link-flights">Cheap flights</a><a href="#search" data-testid="footer-link-hotels">Hotels</a><a href="#search" data-testid="footer-link-transfers">Airport transfers</a></div><div><h4>Notes</h4><a href="#top" onClick={() => showToast('The OneTripz journal is coming soon.')} data-testid="footer-link-journal">The journal</a><a href="#top" onClick={() => showToast('Support is ready when you need it.')} data-testid="footer-link-support">Support</a><a href="#top" onClick={() => showToast('Privacy is part of the trip.')} data-testid="footer-link-privacy">Privacy</a></div></div><div className="ot-footer-bottom"><span>© 2025 OneTripz. For the curious, near and far.</span><span className="ot-mono">Go somewhere good</span></div></div>
+        <div className="ot-container"><div className="ot-footer-grid"><div><img src={logo} alt="OneTripz" className="ot-footer-logo" /><p>A clearer way to compare and book the parts of a trip that make it yours.</p></div><div><h4>Explore</h4><a href="#search" data-testid="footer-link-search">Search flights</a><a href="#destinations" data-testid="footer-link-destinations">Destinations</a><a href="#faq" data-testid="footer-link-faq">FAQ</a><a href="#why-onetrip" data-testid="footer-link-about">Why OneTripz</a></div><div><h4>Travel well</h4><a href="#search" data-testid="footer-link-flights">Cheap flights</a><a href="#search" data-testid="footer-link-hotels">Hotels</a><a href="#search" data-testid="footer-link-transfers">Airport transfers</a></div><div><h4>Notes</h4><a href="#top" onClick={() => showToast('The OneTripz journal is coming soon.')} data-testid="footer-link-journal">The journal</a><a href="#top" onClick={() => showToast('Support is ready when you need it.')} data-testid="footer-link-support">Support</a><a href="#top" onClick={() => showToast('Privacy is part of the trip.')} data-testid="footer-link-privacy">Privacy</a></div></div><div className="ot-footer-bottom"><span>© 2025 OneTripz. For the curious, near and far.</span><span className="ot-mono">Go somewhere good</span></div></div>
       </footer>
       {toast && <div className="ot-toast" role="status" data-testid="status-toast">{toast}</div>}
     </main>

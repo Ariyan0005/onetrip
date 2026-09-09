@@ -494,15 +494,7 @@ button, a, input, select { -webkit-tap-highlight-color: transparent; }
 .ot-language-option:hover, .ot-language-option.selected { background:hsl(var(--muted)); color:hsl(var(--secondary)); }
 .ot-toast { position:fixed; right:22px; bottom:22px; z-index:80; background:hsl(var(--secondary)); color:hsl(var(--background)); padding:14px 18px; border-radius:12px; box-shadow:var(--shadow-lg); font-size:13px; animation:ot-rise .28s ease both; }
 
-/* SEO Route & FAQ Sections */
-.ot-routes-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(280px, 1fr)); gap:16px; margin-top:28px; }
-.ot-route-card { display:flex; flex-direction:column; justify-content:space-between; background:hsl(var(--card)); border:1px solid hsl(var(--card-border)); border-radius:16px; padding:20px; transition:border-color .2s ease, transform .2s ease, box-shadow .2s ease; text-decoration:none; color:inherit; text-align:left; cursor:pointer; }
-.ot-route-card:hover { border-color:hsl(var(--primary)); transform:translateY(-2px); box-shadow:var(--shadow-md); }
-.ot-route-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:12px; }
-.ot-route-tag { font-size:10px; font-family:var(--app-font-mono); letter-spacing:.06em; text-transform:uppercase; color:hsl(var(--primary)); background:hsl(var(--primary) / .08); padding:4px 8px; border-radius:6px; font-weight:600; }
-.ot-route-price { font-size:12px; font-weight:700; color:hsl(var(--secondary)); }
-.ot-route-cities { font-family:var(--app-font-serif); font-size:19px; color:hsl(var(--secondary)); display:flex; align-items:center; gap:8px; margin:4px 0 6px; }
-.ot-route-sub { font-size:11px; color:hsl(var(--muted-foreground)); margin:0; }
+/* FAQ Section */
 
 .ot-faq-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(360px, 1fr)); gap:20px; margin-top:32px; }
 .ot-faq-card { background:hsl(var(--card)); border:1px solid hsl(var(--card-border)); border-radius:18px; padding:24px; box-shadow:var(--shadow-sm); }
