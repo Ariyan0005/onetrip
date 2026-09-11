@@ -75,60 +75,72 @@ sudo find "$DEPLOY_DIR" -type d -exec chmod 755 {} \;
 sudo find "$DEPLOY_DIR" -type f -exec chmod 644 {} \;
 
 if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
-  NGINX_AVAILABLE="/etc/nginx/sites-available/$NGINX_SITE_NAME"
-  NGINX_ENABLED="/etc/nginx/sites-enabled/$NGINX_SITE_NAME"
-  if [[ -f "$NGINX_AVAILABLE" ]]; then
-    echo "Existing Nginx config detected at $NGINX_AVAILABLE; leaving it unchanged."
-    echo "Make sure its root points to $DEPLOY_DIR and /api/ proxies to 127.0.0.1:$API_PORT."
-  else
+    NGINX_AVAILABLE="/etc/nginx/sites-available/$NGINX_SITE_NAME"
+    NGINX_ENABLED="/etc/nginx/sites-enabled/$NGINX_SITE_NAME"
+    NGINX_SERVER_NAMES="$DOMAIN"
+    if [[ "$DOMAIN" != www.* ]]; then
+      NGINX_SERVER_NAMES+=" www.$DOMAIN"
+    fi
+
+    # Reconcile the site config on each deploy so stale Nginx rules cannot hide
+    # SPA routes or the API. Set PRESERVE_NGINX_CONFIG=1 for externally managed
+    # configs (for example, a custom TLS setup) and apply routing manually.
     TMP_CONFIG="$(mktemp)"
+    trap 'rm -f "$TMP_CONFIG"' EXIT
 
     cat > "$TMP_CONFIG" <<EOF
-server {
-    listen 80;
-    listen [::]:80;
-    server_name $DOMAIN;
+    server {
+      listen 80;
+      listen [::]:80;
+      server_name $NGINX_SERVER_NAMES;
 
-    root $DEPLOY_DIR;
-    index index.html;
+      root $DEPLOY_DIR;
+      index index.html;
 
-    location / {
-        try_files \$uri \$uri/ /index.html;
+      location /api/ {
+          proxy_pass http://127.0.0.1:$API_PORT;
+          proxy_http_version 1.1;
+          proxy_set_header Host \$host;
+          proxy_set_header X-Real-IP \$remote_addr;
+          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+          proxy_set_header X-Forwarded-Proto \$scheme;
+      }
+
+      location / {
+          try_files \$uri \$uri/ /index.html;
+      }
+
+      location = /healthz {
+          access_log off;
+          add_header Content-Type text/plain;
+          return 200 "ok\n";
+      }
+
+      location ~* \.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|woff2?)\$ {
+          expires 7d;
+          add_header Cache-Control "public, max-age=604800, immutable";
+          try_files \$uri =404;
+      }
     }
+    EOF
 
-    location /api/ {
-        proxy_pass http://127.0.0.1:$API_PORT;
-        proxy_http_version 1.1;
-        proxy_set_header Host \$host;
-        proxy_set_header X-Real-IP \$remote_addr;
-        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-        proxy_set_header X-Forwarded-Proto \$scheme;
-    }
+    if [[ "${PRESERVE_NGINX_CONFIG:-0}" == "1" && -f "$NGINX_AVAILABLE" ]]; then
+      echo "PRESERVE_NGINX_CONFIG=1; leaving existing Nginx config unchanged."
+      echo "Ensure it serves $DEPLOY_DIR, falls back to /index.html, and proxies /api/ to 127.0.0.1:$API_PORT."
+    else
+      sudo install -m 644 "$TMP_CONFIG" "$NGINX_AVAILABLE"
+      echo "Installed Nginx config at $NGINX_AVAILABLE."
+    fi
 
-    location = /healthz {
-        access_log off;
-        add_header Content-Type text/plain;
-        return 200 "ok\n";
-    }
-
-    location ~* \.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|woff2?)\$ {
-        expires 7d;
-        add_header Cache-Control "public, max-age=604800, immutable";
-        try_files \$uri =404;
-    }
-}
-EOF
-
-    sudo install -m 644 "$TMP_CONFIG" "$NGINX_AVAILABLE"
     rm -f "$TMP_CONFIG"
+    trap - EXIT
     sudo ln -sfn "$NGINX_AVAILABLE" "$NGINX_ENABLED"
-  fi
-  sudo nginx -t
-  sudo systemctl reload nginx
-  echo "Nginx reloaded for $DOMAIN."
-else
-  echo "Nginx was not detected; files were copied but web-server configuration was skipped."
-fi
+    sudo nginx -t
+    sudo systemctl reload nginx
+    echo "Nginx reloaded for $DOMAIN."
+    else
+    echo "Nginx was not detected; files were copied but web-server configuration was skipped."
+    fifi
 
 if command -v systemctl >/dev/null 2>&1; then
   API_UNIT_PATH="/etc/systemd/system/onetrip-api.service"
