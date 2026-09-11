@@ -132,12 +132,12 @@ fi
 
 if command -v systemctl >/dev/null 2>&1; then
   API_UNIT_PATH="/etc/systemd/system/onetrip-api.service"
-  if [[ ! -f "$API_UNIT_PATH" ]]; then
-    echo "Installing onetrip-api.service..."
+  if [[ ! -f "$API_UNIT_PATH" ]] || ! cmp -s "$APP_DIR/scripts/onetrip-api.service" "$API_UNIT_PATH"; then
+    echo "Installing/updating onetrip-api.service..."
     sudo install -m 644 "$APP_DIR/scripts/onetrip-api.service" "$API_UNIT_PATH"
     sudo systemctl daemon-reload
-    sudo systemctl enable onetrip-api.service
   fi
+  sudo systemctl enable onetrip-api.service
   echo "Restarting onetrip-api.service..."
   sudo systemctl restart onetrip-api.service
 else
