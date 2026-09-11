@@ -130,7 +130,14 @@ else
   echo "Nginx was not detected; files were copied but web-server configuration was skipped."
 fi
 
-if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files onetrip-api.service >/dev/null 2>&1; then
+if command -v systemctl >/dev/null 2>&1; then
+  API_UNIT_PATH="/etc/systemd/system/onetrip-api.service"
+  if [[ ! -f "$API_UNIT_PATH" ]]; then
+    echo "Installing onetrip-api.service..."
+    sudo install -m 644 "$APP_DIR/scripts/onetrip-api.service" "$API_UNIT_PATH"
+    sudo systemctl daemon-reload
+    sudo systemctl enable onetrip-api.service
+  fi
   echo "Restarting onetrip-api.service..."
   sudo systemctl restart onetrip-api.service
 else

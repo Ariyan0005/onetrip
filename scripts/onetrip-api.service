@@ -8,7 +8,7 @@ User=www-data
 WorkingDirectory=/var/www/onetripz.com
 Environment=NODE_ENV=production
 Environment=PORT=5000
-ExecStart=/usr/bin/env pnpm --filter @workspace/api-server run start
+ExecStart=/usr/bin/node --enable-source-maps /var/www/onetripz.com/artifacts/api-server/dist/index.mjs
 Restart=always
 RestartSec=5
 
