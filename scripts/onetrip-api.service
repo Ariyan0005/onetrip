@@ -6,6 +6,7 @@ After=network.target
 Type=simple
 User=www-data
 WorkingDirectory=/var/www/onetripz.com
+EnvironmentFile=-/etc/onetrip/onetrip-api.env
 Environment=NODE_ENV=production
 Environment=PORT=5001
 ExecStart=/usr/bin/node --enable-source-maps /var/www/onetripz.com/artifacts/api-server/dist/index.mjs
@@ -17,7 +18,6 @@ RestartSec=5
 # SUPABASE_SERVICE_ROLE_KEY=
 # ADMIN_PANEL_PASSWORD=
 # SESSION_SECRET=
-EnvironmentFile=-/etc/onetrip/onetrip-api.env
 
 [Install]
 WantedBy=multi-user.target
