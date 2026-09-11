@@ -21,7 +21,7 @@ GIT_BRANCH="${GIT_BRANCH:-main}"
 BUILD_DIR="$APP_DIR/artifacts/onetrip/dist/public"
 DEPLOY_DIR="${DEPLOY_DIR:-$BUILD_DIR}"
 NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetripz.com}"
-API_PORT="${API_PORT:-5000}"
+API_PORT="${API_PORT:-5001}"
 
 if [[ -z "$DOMAIN" ]]; then
   echo "Missing DOMAIN. Example: DOMAIN=travel.example.com $0" >&2

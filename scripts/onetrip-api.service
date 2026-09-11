@@ -7,7 +7,7 @@ Type=simple
 User=www-data
 WorkingDirectory=/var/www/onetripz.com
 Environment=NODE_ENV=production
-Environment=PORT=5000
+Environment=PORT=5001
 ExecStart=/usr/bin/node --enable-source-maps /var/www/onetripz.com/artifacts/api-server/dist/index.mjs
 Restart=always
 RestartSec=5

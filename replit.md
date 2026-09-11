@@ -4,7 +4,7 @@ OneTrip is an English-first travel booking website for comparing flights, stays,
 
 ## Run & Operate
 
-- `pnpm --filter @workspace/api-server run dev` — run the API server (port 5000)
+- `pnpm --filter @workspace/api-server run dev` — run the API server (the workflow injects its port; OneTripz VPS defaults to port 5001)
 - `pnpm run typecheck` — full typecheck across all packages
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
@@ -48,7 +48,7 @@ Users can explore destinations, switch between flights/hotels/tours/transfers, e
 
 - Build commands need `PORT` and `BASE_PATH` in the Replit workflow; the VPS script supplies the normal Vite build command directly.
 - Set `DOMAIN` when running `scripts/deploy-vps.sh`; it configures Nginx only when Nginx is already installed.
-- On a VPS, install `scripts/onetrip-api.service`, create `/etc/onetrip/onetrip-api.env` with the four API variables, enable the service, and ensure Nginx proxies `/api/` to `API_PORT`.
+- On a VPS, install `scripts/onetrip-api.service`, create `/etc/onetrip/onetrip-api.env` with the four API variables, enable the service, and ensure Nginx proxies `/api/` to port 5001 (or the `API_PORT` override used during deployment).
 
 ## Pointers
 
