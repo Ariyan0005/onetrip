@@ -85,17 +85,92 @@ if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
     # Reconcile the site config on each deploy so stale Nginx rules cannot hide
     # SPA routes or the API. Set PRESERVE_NGINX_CONFIG=1 for externally managed
     # configs (for example, a custom TLS setup) and apply routing manually.
-    TMP_CONFIG="$(mktemp)"
-    trap 'rm -f "$TMP_CONFIG"' EXIT
+    #
+    # The previous config only listened on port 80. When Cloudflare or a browser
+    # reached the VPS over HTTPS, Nginx could therefore select another site's
+    # 443 server block. Prefer explicit certificate paths, then detect the
+    # standard certificate locations used by Certbot and common VPS setups.
+    SSL_CERTIFICATE="${SSL_CERTIFICATE:-}"
+    SSL_CERTIFICATE_KEY="${SSL_CERTIFICATE_KEY:-}"
+    if [[ -z "$SSL_CERTIFICATE" && -z "$SSL_CERTIFICATE_KEY" ]]; then
+      for CERT_DIR in \
+        "/etc/letsencrypt/live/$DOMAIN" \
+        "/etc/ssl/$DOMAIN" \
+        "/etc/nginx/ssl/$DOMAIN"; do
+        if [[ -f "$CERT_DIR/fullchain.pem" && -f "$CERT_DIR/privkey.pem" ]]; then
+          SSL_CERTIFICATE="$CERT_DIR/fullchain.pem"
+          SSL_CERTIFICATE_KEY="$CERT_DIR/privkey.pem"
+          break
+        elif [[ -f "$CERT_DIR/$DOMAIN.crt" && -f "$CERT_DIR/$DOMAIN.key" ]]; then
+          SSL_CERTIFICATE="$CERT_DIR/$DOMAIN.crt"
+          SSL_CERTIFICATE_KEY="$CERT_DIR/$DOMAIN.key"
+          break
+        fi
+      done
+    fi
 
-    cat > "$TMP_CONFIG" <<EOF
+    if [[ -z "$SSL_CERTIFICATE" && -z "$SSL_CERTIFICATE_KEY" ]] \
+      && command -v nginx >/dev/null 2>&1; then
+      mapfile -t DETECTED_SSL_PATHS < <(
+        sudo nginx -T 2>/dev/null | awk -v domain="$DOMAIN" '
+          $1 == "server_name" {
+            is_target = 0
+            for (i = 2; i <= NF; i++) {
+              name = $i
+              gsub(";", "", name)
+              if (name == domain) is_target = 1
+            }
+          }
+          is_target && $1 == "ssl_certificate" {
+            gsub(";", "", $2)
+            certificate = $2
+          }
+          is_target && $1 == "ssl_certificate_key" {
+            gsub(";", "", $2)
+            certificate_key = $2
+          }
+          is_target && /^}/ {
+            if (certificate != "" && certificate_key != "") {
+              print certificate
+              print certificate_key
+              exit
+            }
+            certificate = ""
+            certificate_key = ""
+            is_target = 0
+          }
+        ' || true
+      )
+      if [[ "${#DETECTED_SSL_PATHS[@]}" -eq 2 ]]; then
+        SSL_CERTIFICATE="${DETECTED_SSL_PATHS[0]}"
+        SSL_CERTIFICATE_KEY="${DETECTED_SSL_PATHS[1]}"
+      fi
+    fi
+
+    NGINX_SSL_DIRECTIVES=""
+    if [[ -n "$SSL_CERTIFICATE" && -n "$SSL_CERTIFICATE_KEY" \
+      && -f "$SSL_CERTIFICATE" && -f "$SSL_CERTIFICATE_KEY" ]]; then
+      NGINX_SSL_DIRECTIVES="  ssl_certificate $SSL_CERTIFICATE;
+  ssl_certificate_key $SSL_CERTIFICATE_KEY;"
+      echo "HTTPS certificate detected; configuring HTTP and HTTPS for $DOMAIN."
+    else
+      echo "No TLS certificate pair found for $DOMAIN; configuring HTTP only."
+      echo "Set SSL_CERTIFICATE and SSL_CERTIFICATE_KEY to configure the HTTPS server block."
+    fi
+
+    write_server_block() {
+      local port="$1"
+      local ssl_suffix="$2"
+      cat <<EOF
 server {
-  listen 80;
-  listen [::]:80;
+  listen ${port}${ssl_suffix};
+  listen [::]:${port}${ssl_suffix};
   server_name $NGINX_SERVER_NAMES;
 
   root $DEPLOY_DIR;
   index index.html;
+
+  ${NGINX_SSL_DIRECTIVES}
 
   location /api/ {
       proxy_pass http://127.0.0.1:$API_PORT;
@@ -141,6 +216,16 @@ server {
   }
 }
 EOF
+    }
+
+    TMP_CONFIG="$(mktemp)"
+    trap 'rm -f "$TMP_CONFIG"' EXIT
+    {
+      write_server_block 80 ""
+      if [[ -n "$NGINX_SSL_DIRECTIVES" ]]; then
+        write_server_block 443 " ssl"
+      fi
+    } > "$TMP_CONFIG"
 
     if [[ "${PRESERVE_NGINX_CONFIG:-0}" == "1" && -f "$NGINX_AVAILABLE" ]]; then
       echo "PRESERVE_NGINX_CONFIG=1; leaving existing Nginx config unchanged."
