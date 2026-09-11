@@ -89,40 +89,58 @@ if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
     trap 'rm -f "$TMP_CONFIG"' EXIT
 
     cat > "$TMP_CONFIG" <<EOF
-    server {
-      listen 80;
-      listen [::]:80;
-      server_name $NGINX_SERVER_NAMES;
+server {
+  listen 80;
+  listen [::]:80;
+  server_name $NGINX_SERVER_NAMES;
 
-      root $DEPLOY_DIR;
-      index index.html;
+  root $DEPLOY_DIR;
+  index index.html;
 
-      location /api/ {
-          proxy_pass http://127.0.0.1:$API_PORT;
-          proxy_http_version 1.1;
-          proxy_set_header Host \$host;
-          proxy_set_header X-Real-IP \$remote_addr;
-          proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
-          proxy_set_header X-Forwarded-Proto \$scheme;
-      }
+  location /api/ {
+      proxy_pass http://127.0.0.1:$API_PORT;
+      proxy_http_version 1.1;
+      proxy_set_header Host \$host;
+      proxy_set_header X-Real-IP \$remote_addr;
+      proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-Proto \$scheme;
+  }
 
-      location / {
-          try_files \$uri \$uri/ /index.html;
-      }
+  # These are client-side routes. Keep explicit fallbacks so an existing
+  # Nginx location or a trailing-slash variant cannot turn them into 404s.
+  location = /admin {
+      try_files \$uri /index.html;
+  }
 
-      location = /healthz {
-          access_log off;
-          add_header Content-Type text/plain;
-          return 200 "ok\n";
-      }
+  location = /admin/ {
+      try_files \$uri /index.html;
+  }
 
-      location ~* \.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|woff2?)\$ {
-          expires 7d;
-          add_header Cache-Control "public, max-age=604800, immutable";
-          try_files \$uri =404;
-      }
-    }
-    EOF
+  location = /admin-setup {
+      try_files \$uri /index.html;
+  }
+
+  location = /admin-setup/ {
+      try_files \$uri /index.html;
+  }
+
+  location / {
+      try_files \$uri \$uri/ /index.html;
+  }
+
+  location = /healthz {
+      access_log off;
+      add_header Content-Type text/plain;
+      return 200 "ok\n";
+  }
+
+  location ~* \.(?:css|js|png|jpg|jpeg|gif|svg|webp|ico|woff2?)\$ {
+      expires 7d;
+      add_header Cache-Control "public, max-age=604800, immutable";
+      try_files \$uri =404;
+  }
+}
+EOF
 
     if [[ "${PRESERVE_NGINX_CONFIG:-0}" == "1" && -f "$NGINX_AVAILABLE" ]]; then
       echo "PRESERVE_NGINX_CONFIG=1; leaving existing Nginx config unchanged."
@@ -140,7 +158,7 @@ if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
     echo "Nginx reloaded for $DOMAIN."
     else
     echo "Nginx was not detected; files were copied but web-server configuration was skipped."
-    fifi
+    fi
 
 if command -v systemctl >/dev/null 2>&1; then
   API_UNIT_PATH="/etc/systemd/system/onetrip-api.service"
