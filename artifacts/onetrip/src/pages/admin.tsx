@@ -162,6 +162,7 @@ export default function Admin() {
             <p>Widget code and placements are stored in the connected Supabase project. Only the admin session can change them.</p>
             {!configured && <div className="ot-admin-error">Set ADMIN_PANEL_PASSWORD and SESSION_SECRET on the VPS before signing in.</div>}
             <form className="ot-admin-form" onSubmit={handleLogin}>
+               <input type="text" name="username" autoComplete="username" tabIndex={-1} aria-hidden="true" className="ot-visually-hidden" />
               <label>Admin password<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} autoComplete="current-password" placeholder="Enter admin password" /></label>
               <button className="ot-admin-primary" type="submit"><Code2 size={16} /> Sign in</button>
               {error && <p className="ot-admin-error" role="alert">{error}</p>}

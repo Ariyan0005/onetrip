@@ -38,6 +38,10 @@ function supabaseError(res: import("express").Response, error: unknown) {
     return;
   }
   if (error instanceof SupabaseRequestError) {
+    if (error.status === 404) {
+      res.status(503).json({ error: "Supabase table travel_widgets is missing. Run supabase/widget-config.sql in the connected Supabase project." });
+      return;
+    }
     res.status(502).json({ error: "Widget storage request failed." });
     return;
   }

@@ -1,1 +1,2 @@
 - [GitHub publishing path](github-publishing.md) — when GitHub REST writes are Cloudflare-blocked, a secret-backed local git push is the reliable fallback.
+- [Supabase connector and schema setup](supabase-connector-ddl.md) — PostgREST access works after connection, but schema creation remains an explicit migration step.
