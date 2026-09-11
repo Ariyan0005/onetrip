@@ -193,7 +193,7 @@ function Home() {
               </button>
               {languageOpen && <LanguagePopover language={language} onSelect={(next) => { setLanguage(next); setLanguageOpen(false); showToast(`Language preference set to ${next}.`); }} />}
             </div>
-            <a className="ot-admin-link" href={`${import.meta.env.BASE_URL}admin-setuo`}>Admin</a>
+            <a className="ot-admin-link" href={`${import.meta.env.BASE_URL}admin-setup`}>Admin</a>
             <a className="ot-primary-btn" href="#search" data-testid="link-start-planning">Start planning <ArrowRight size={16} /></a>
             <button className="ot-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} data-testid="button-mobile-menu">{menuOpen ? <X size={23} /> : <Menu size={23} />}</button>
           </div>
@@ -361,7 +361,7 @@ function WidgetEmptyState({ category, error }: { category: WidgetCategory; error
     <div className="ot-widget-empty">
       <div className="ot-widget-empty-icon"><MapPinned size={18} /></div>
       <div><strong>{error ? 'Live widget service is not connected.' : category === 'flights' ? 'No flight widget is published yet.' : `No ${label} widget is published yet.`}</strong><p>{error || 'Publish a provider widget from the admin panel to show it in this tab.'}</p></div>
-      <a href={`${import.meta.env.BASE_URL}admin-setuo`}>Open Admin <ArrowRight size={14} /></a>
+      <a href={`${import.meta.env.BASE_URL}admin-setup`}>Open Admin <ArrowRight size={14} /></a>
     </div>
   );
 }
