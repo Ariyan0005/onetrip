@@ -1,14 +1,17 @@
-import { useEffect, useRef, useState, type ReactNode } from 'react';
-import { ArrowRight, Check, ChevronDown, Globe2, Menu, Search, ShieldCheck, Sparkles, Users, X } from 'lucide-react';
+import { useEffect, useState, type ReactNode } from 'react';
+import { ArrowRight, Bike, CarFront, Check, ChevronDown, Globe2, Hotel, MapPinned, Menu, Plane, Search, ShieldCheck, Sparkles, Users, X } from 'lucide-react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { WidgetRenderer } from '@/components/widget-renderer';
 import { Toaster } from '@/components/ui/toaster';
+import Admin from '@/pages/admin';
 import NotFound from '@/pages/not-found';
+import { getPublicWidgets, WidgetApiError } from '@/lib/widget-api';
+import type { TravelWidget, WidgetCategory } from '@/lib/widget-store';
 import { Route, Switch, useLocation, Router as WouterRouter } from 'wouter';
 
 const queryClient = new QueryClient();
 const logo = `${import.meta.env.BASE_URL}onetrip-logo.png`;
-const travelpayoutsWidgetScript = 'https://tpscr.com/wl_web/main.js?wl_id=21725';
 const languages = ['English', 'Español', 'Français', 'Deutsch', 'Italiano', 'Português', 'Nederlands', 'Türkçe', 'Ελληνικά', '中文', '日本語', '한국어', 'العربية', 'हिन्दी', 'ภาษาไทย', 'Bahasa Indonesia', 'Polski', 'Svenska', 'Dansk', 'Norsk', 'Suomi', 'Čeština', 'Magyar', 'עברית', 'Tiếng Việt', 'Українська'];
 
 interface IconicSpot {
@@ -120,40 +123,43 @@ const faqs: FAQItem[] = [
   },
 ];
 
-declare global {
-  interface Window {
-    TPWL_CONFIGURATION?: Record<string, unknown>;
-  }
-}
-
 function Home() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [languageOpen, setLanguageOpen] = useState(false);
   const [language, setLanguage] = useState('English');
   const [toast, setToast] = useState('');
+  const [activeCategory, setActiveCategory] = useState<WidgetCategory>('flights');
+  const [widgets, setWidgets] = useState<TravelWidget[]>([]);
+  const [widgetLoading, setWidgetLoading] = useState(true);
+  const [widgetError, setWidgetError] = useState('');
 
   useEffect(() => {
-    window.TPWL_CONFIGURATION = {
-      ...window.TPWL_CONFIGURATION,
-      resultsURL: 'https://book.onetripz.com',
-    };
-
-    const scriptSrc = 'https://tpscr.com/wl_web/main.js?wl_id=21725';
-    const existing = document.querySelector<HTMLScriptElement>(`script[src*="wl_web/main.js"]`);
-    if (!existing) {
-      const script = document.createElement('script');
-      script.type = 'module';
-      script.async = true;
-      script.src = scriptSrc;
-      document.head.appendChild(script);
-    }
-
     const favicon = document.querySelector<HTMLLinkElement>('link[data-onetrip-favicon]') || document.createElement('link');
     favicon.rel = 'icon';
     favicon.type = 'image/png';
     favicon.href = logo;
     favicon.dataset.onetripFavicon = 'true';
     if (!favicon.parentNode) document.head.appendChild(favicon);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    void getPublicWidgets()
+      .then((nextWidgets) => {
+        if (cancelled) return;
+        setWidgets(nextWidgets);
+        setWidgetError('');
+      })
+      .catch((error: unknown) => {
+        if (cancelled) return;
+        setWidgetError(error instanceof WidgetApiError ? error.message : 'Widget service is unavailable.');
+      })
+      .finally(() => {
+        if (!cancelled) setWidgetLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   useEffect(() => {
@@ -187,6 +193,7 @@ function Home() {
               </button>
               {languageOpen && <LanguagePopover language={language} onSelect={(next) => { setLanguage(next); setLanguageOpen(false); showToast(`Language preference set to ${next}.`); }} />}
             </div>
+            <a className="ot-admin-link" href={`${import.meta.env.BASE_URL}admin-setuo`}>Admin</a>
             <a className="ot-primary-btn" href="#search" data-testid="link-start-planning">Start planning <ArrowRight size={16} /></a>
             <button className="ot-menu-button" onClick={() => setMenuOpen((open) => !open)} aria-label={menuOpen ? 'Close menu' : 'Open menu'} aria-expanded={menuOpen} data-testid="button-mobile-menu">{menuOpen ? <X size={23} /> : <Menu size={23} />}</button>
           </div>
@@ -205,12 +212,31 @@ function Home() {
             <h1 className="ot-hero-title">Compare flight tickets,<br className="ot-break-mobile" /> hotels & tours worldwide</h1>
           </div>
 
-          <div className="ot-search-wrap" id="search" aria-label="Trip search">
-            <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
-              <div className="ot-tpwl-widget-host" data-testid="container-tpwl-host">
-                <div id="tpwl-search" aria-label="Flight search form" />
-                <div id="tpwl-tickets" aria-label="Flight search results" />
-              </div>
+           <div className="ot-search-wrap" id="search" aria-label="Trip search">
+             <div className="ot-search-panel ot-travelpayouts-panel" data-testid="panel-travelpayouts-widget">
+               <div className="ot-widget-tabs" role="tablist" aria-label="Travel booking categories">
+                 {[
+                   { value: 'flights' as const, label: 'Flights', icon: Plane },
+                   { value: 'hotels' as const, label: 'Hotels', icon: Hotel },
+                   { value: 'cars' as const, label: 'Cars', icon: CarFront },
+                   { value: 'bikes' as const, label: 'Bikes', icon: Bike },
+                 ].map(({ value, label, icon: Icon }) => (
+                   <button className={`ot-widget-tab${activeCategory === value ? ' is-active' : ''}`} type="button" role="tab" aria-selected={activeCategory === value} key={value} onClick={() => setActiveCategory(value)}>
+                     <Icon size={16} /> {label}
+                   </button>
+                 ))}
+               </div>
+               <div className="ot-tpwl-widget-host" data-testid="container-tpwl-host">
+                {widgets.filter((widget) => widget.active && widget.category === activeCategory && widget.placement === 'hero').map((widget) => (
+                   <div className="ot-widget-instance" key={widget.id}>
+                     <WidgetRenderer widget={widget} />
+                   </div>
+                 ))}
+                 {!widgetLoading && !widgets.some((widget) => widget.active && widget.category === activeCategory && widget.placement === 'hero') && (
+                   <WidgetEmptyState category={activeCategory} error={widgetError} />
+                 )}
+                 {widgetLoading && <div className="ot-widget-loading">Loading live widget configuration…</div>}
+               </div>
 
               {/* Title & Trust Info Under the Search Widget */}
               <div className="ot-widget-footer">
@@ -270,6 +296,7 @@ function Home() {
           ))}
         </div>
       </section>
+       <WidgetPlacementSection widgets={widgets} placement="after-destinations" />
 
       <section className="ot-section ot-editorial" id="why-onetrip">
         <div className="ot-container ot-editorial-grid">
@@ -286,6 +313,7 @@ function Home() {
           <article className="ot-feature"><div className="ot-feature-icon"><Users size={23} /></div><h3>Made for real travelers</h3><p>Whether it is your first long-haul trip or your forty-first, the next step stays simple.</p></article>
         </div>
       </section>
+       <WidgetPlacementSection widgets={widgets} placement="before-faq" />
 
       <section className="ot-section ot-container" id="faq" aria-labelledby="faq-heading">
         <div className="ot-section-top">
@@ -308,13 +336,14 @@ function Home() {
             </article>
           ))}
         </div>
-      </section>
+       </section>
 
       <section className="ot-cta">
         <div className="ot-container ot-cta-inner"><h2 className="ot-display">There is a whole world past the open tabs.</h2><div><p>Close the research spiral. Start with one destination and let the rest unfold.</p><a className="ot-primary-btn" href="#search" data-testid="link-cta-search">Start with a search <ArrowRight size={16} /></a></div></div>
       </section>
 
-      <footer className="ot-footer">
+       <WidgetPlacementSection widgets={widgets} placement="footer" />
+       <footer className="ot-footer">
         <div className="ot-container"><div className="ot-footer-grid"><div><img src={logo} alt="OneTripz" className="ot-footer-logo" /><p>A clearer way to compare and book the parts of a trip that make it yours.</p></div><div><h4>Explore</h4><a href="#search" data-testid="footer-link-search">Search flights</a><a href="#destinations" data-testid="footer-link-destinations">Destinations</a><a href="#faq" data-testid="footer-link-faq">FAQ</a><a href="#why-onetrip" data-testid="footer-link-about">Why OneTripz</a></div><div><h4>Travel well</h4><a href="#search" data-testid="footer-link-flights">Cheap flights</a><a href="#search" data-testid="footer-link-hotels">Hotels</a><a href="#search" data-testid="footer-link-transfers">Airport transfers</a></div><div><h4>Notes</h4><a href="#top" onClick={() => showToast('The OneTripz journal is coming soon.')} data-testid="footer-link-journal">The journal</a><a href="#top" onClick={() => showToast('Support is ready when you need it.')} data-testid="footer-link-support">Support</a><a href="#top" onClick={() => showToast('Privacy is part of the trip.')} data-testid="footer-link-privacy">Privacy</a></div></div><div className="ot-footer-bottom"><span>© 2025 OneTripz. For the curious, near and far.</span><span className="ot-mono">Go somewhere good</span></div></div>
       </footer>
       {toast && <div className="ot-toast" role="status" data-testid="status-toast">{toast}</div>}
@@ -326,8 +355,41 @@ function LanguagePopover({ language, onSelect }: { language: string; onSelect: (
   return <div className="ot-language-popover" role="dialog" aria-label="Choose language" data-testid="popover-language"><strong>Choose your language</strong><div className="ot-language-list">{languages.map((option) => <button className={`ot-language-option ${language === option ? 'selected' : ''}`} key={option} onClick={() => onSelect(option)} data-testid={`language-${option.toLowerCase().replace(/\s/g, '-')}`}>{language === option && <Check size={12} style={{ marginRight: 4, verticalAlign: 'middle' }} />}{option}</button>)}</div></div>;
 }
 
+function WidgetEmptyState({ category, error }: { category: WidgetCategory; error?: string }) {
+  const label = category === 'cars' ? 'car rental' : category === 'bikes' ? 'bike rental' : category.slice(0, -1);
+  return (
+    <div className="ot-widget-empty">
+      <div className="ot-widget-empty-icon"><MapPinned size={18} /></div>
+      <div><strong>{error ? 'Live widget service is not connected.' : category === 'flights' ? 'No flight widget is published yet.' : `No ${label} widget is published yet.`}</strong><p>{error || 'Publish a provider widget from the admin panel to show it in this tab.'}</p></div>
+      <a href={`${import.meta.env.BASE_URL}admin-setuo`}>Open Admin <ArrowRight size={14} /></a>
+    </div>
+  );
+}
+
+function WidgetPlacementSection({ widgets, placement }: { widgets: TravelWidget[]; placement: 'after-destinations' | 'before-faq' | 'footer' }) {
+  const activeWidgets = widgets.filter((widget) => widget.active && widget.placement === placement);
+  if (!activeWidgets.length) return null;
+
+  const placementCopy = {
+    'after-destinations': { kicker: 'More ways to go', title: 'Book the details that make the trip yours.', icon: <MapPinned size={18} /> },
+    'before-faq': { kicker: 'Keep planning', title: 'One more useful thing before you go.', icon: <Search size={18} /> },
+    footer: { kicker: 'Travel partners', title: 'Bring the next part of your journey closer.', icon: <ArrowRight size={18} /> },
+  }[placement];
+
+  return (
+    <section className={`ot-widget-section ot-widget-section-${placement}`} aria-label={placementCopy.title}>
+      <div className="ot-container">
+        <div className="ot-widget-section-heading"><div><p className="ot-section-kicker ot-mono">{placementCopy.kicker}</p><h2 className="ot-display">{placementCopy.title}</h2></div><span className="ot-widget-section-mark">{placementCopy.icon}</span></div>
+        <div className="ot-placed-widgets">
+          {activeWidgets.map((widget) => <article className="ot-placed-widget" key={widget.id}><div className="ot-placed-widget-label"><span>{widget.provider}</span><strong>{widget.title}</strong></div><WidgetRenderer widget={widget} /></article>)}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Router() {
-  return <RoutedErrorBoundary><Switch><Route path="/" component={Home} /><Route component={NotFound} /></Switch></RoutedErrorBoundary>;
+  return <RoutedErrorBoundary><Switch><Route path="/" component={Home} /><Route path="/admin" component={Admin} /><Route path="/admin-setuo" component={Admin} /><Route path="/admin-setup" component={Admin} /><Route component={NotFound} /></Switch></RoutedErrorBoundary>;
 }
 
 function RoutedErrorBoundary({ children }: { children: ReactNode }) {

@@ -9,7 +9,8 @@ OneTrip is an English-first travel booking website for comparing flights, stays,
 - `pnpm run build` — typecheck + build all packages
 - `pnpm --filter @workspace/api-spec run codegen` — regenerate API hooks and Zod schemas from the OpenAPI spec
 - `pnpm --filter @workspace/db run push` — push DB schema changes (dev only)
-- Required env: `DATABASE_URL` — Postgres connection string
+- API widget storage env: `SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `ADMIN_PANEL_PASSWORD`, and `SESSION_SECRET`
+- Run `supabase/widget-config.sql` once in Supabase SQL Editor before publishing widgets.
 
 ## Stack
 
@@ -30,10 +31,10 @@ OneTrip is an English-first travel booking website for comparing flights, stays,
 
 ## Architecture decisions
 
-- The first release is a static Vite app; Travelpayouts owns the partner search/booking handoff.
+- The public Vite app reads published travel widgets from the API; Travelpayouts owns the partner search/booking handoff.
 - The Travelpayouts loader is included in `index.html` with the supplied attributes and guarded at runtime against duplicate loading.
 - The booking form keeps the comparison flow explicit and partner-ready rather than pretending to process payments locally.
-- VPS delivery targets Nginx-served static files, so the deploy script can publish without a long-running Node process.
+- VPS delivery targets Nginx-served static files plus a long-running API process. Nginx proxies `/api/` to the API port.
 
 ## Product
 
@@ -47,6 +48,7 @@ Users can explore destinations, switch between flights/hotels/tours/transfers, e
 
 - Build commands need `PORT` and `BASE_PATH` in the Replit workflow; the VPS script supplies the normal Vite build command directly.
 - Set `DOMAIN` when running `scripts/deploy-vps.sh`; it configures Nginx only when Nginx is already installed.
+- On a VPS, install `scripts/onetrip-api.service`, create `/etc/onetrip/onetrip-api.env` with the four API variables, enable the service, and ensure Nginx proxies `/api/` to `API_PORT`.
 
 ## Pointers
 

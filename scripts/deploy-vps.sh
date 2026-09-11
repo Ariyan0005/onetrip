@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -Eeuo pipefail
 
-# Update and deploy the built OneTripz static site to an Nginx-backed VPS.
+# Update and deploy the OneTripz static site and API to an Nginx-backed VPS.
 # Usage from the cloned repository:
 #   DOMAIN=onetrip.example ./scripts/deploy-vps.sh
 #
@@ -21,6 +21,7 @@ GIT_BRANCH="${GIT_BRANCH:-main}"
 BUILD_DIR="$APP_DIR/artifacts/onetrip/dist/public"
 DEPLOY_DIR="${DEPLOY_DIR:-$BUILD_DIR}"
 NGINX_SITE_NAME="${NGINX_SITE_NAME:-onetripz.com}"
+API_PORT="${API_PORT:-5000}"
 
 if [[ -z "$DOMAIN" ]]; then
   echo "Missing DOMAIN. Example: DOMAIN=travel.example.com $0" >&2
@@ -53,6 +54,8 @@ pnpm install --frozen-lockfile
 echo "Building OneTripz..."
 PORT="${PORT:-23051}" BASE_PATH="${BASE_PATH:-/}" \
   pnpm --filter @workspace/onetrip run build
+echo "Building the widget API..."
+pnpm --filter @workspace/api-server run build
 
 if [[ ! -d "$BUILD_DIR" ]]; then
   echo "Build output was not found at $BUILD_DIR" >&2
@@ -76,7 +79,7 @@ if command -v nginx >/dev/null 2>&1 && [[ -d /etc/nginx/sites-available ]]; then
   NGINX_ENABLED="/etc/nginx/sites-enabled/$NGINX_SITE_NAME"
   if [[ -f "$NGINX_AVAILABLE" ]]; then
     echo "Existing Nginx config detected at $NGINX_AVAILABLE; leaving it unchanged."
-    echo "Make sure its root points to $DEPLOY_DIR."
+    echo "Make sure its root points to $DEPLOY_DIR and /api/ proxies to 127.0.0.1:$API_PORT."
   else
     TMP_CONFIG="$(mktemp)"
 
@@ -91,6 +94,15 @@ server {
 
     location / {
         try_files \$uri \$uri/ /index.html;
+    }
+
+    location /api/ {
+        proxy_pass http://127.0.0.1:$API_PORT;
+        proxy_http_version 1.1;
+        proxy_set_header Host \$host;
+        proxy_set_header X-Real-IP \$remote_addr;
+        proxy_set_header X-Forwarded-For \$proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto \$scheme;
     }
 
     location = /healthz {
@@ -118,4 +130,11 @@ else
   echo "Nginx was not detected; files were copied but web-server configuration was skipped."
 fi
 
-echo "OneTripz deployed successfully to $DEPLOY_DIR."
+if command -v systemctl >/dev/null 2>&1 && systemctl list-unit-files onetrip-api.service >/dev/null 2>&1; then
+  echo "Restarting onetrip-api.service..."
+  sudo systemctl restart onetrip-api.service
+else
+  echo "No onetrip-api.service found; start the API with PORT=$API_PORT pnpm --filter @workspace/api-server run start."
+fi
+
+echo "OneTripz deployed successfully to $DEPLOY_DIR. Configure Supabase and admin secrets in the API process environment."
